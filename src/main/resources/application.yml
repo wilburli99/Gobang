@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/java_gobang?allowPublicKeyRetrieval=true&useSSL=false
+    username: root
+    password: 980515Qq!!
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+mybatis:
+  configuration: # ????MyBatis??
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: true #????????
+
+  # ?? mybatis xml ??????? resources/mapper ?????? xml ??
+  mapper-locations: classpath:mapper/**Mapper.xml

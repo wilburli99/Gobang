@@ -1,0 +1,23 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-image: url("../image/34C8DCBD-CE13-4B68-A8CD-108EBA1A75BC.jpg");
+}
+
+.nav {
+    height: 90px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    line-height: 50px;
+    padding: 0 20px;
+    font-size: 50px;
+    font-weight: 700;
+}

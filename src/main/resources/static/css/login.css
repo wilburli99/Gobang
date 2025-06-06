@@ -1,0 +1,59 @@
+
+.login-container {
+    height: calc(100% - 50px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-dialog {
+    width: 600px;
+    height: 400px;
+    background-color: rgba(227, 224, 224, 0.5);
+    border-radius: 10px;
+}
+
+/* 标题 */
+.login-dialog h3 {
+    text-align: center;
+    padding: 50px 0;
+    font-size: 30px;
+    font-weight: 700;
+}
+
+/* 行 */
+.login-dialog .row {
+    width: 100%;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-dialog .row span {
+    width: 100px;
+    font-weight: 700;
+}
+
+#username, #password {
+    width: 200px;
+    height: 40px;
+    font-size: 16px;
+    line-height: 40px;
+    padding-left: 10px;
+    border: none;
+    outline: none;
+    border-radius: 10px;
+}
+
+#submit {
+    width: 200px;
+    height: 40px;
+    background-color: #464c65;
+    color: white;
+    margin-top: 50px;
+}
+
+#submit:active {
+    background-color: #d7d3d3;
+}
