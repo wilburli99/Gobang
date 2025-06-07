@@ -31,16 +31,20 @@ public class Matcher {
             // 通过synchronized关键字加锁，防止线程安全问题
             synchronized (normalQueue){
                 normalQueue.offer(user);
+                // 唤醒匹配线程
+                normalQueue.notify();
             }
             System.out.println("用户" + user.getUsername() + "进入普通队列");
         } else if (user.getScore() >= 2000 && user.getScore() < 3000) {
             synchronized (highQueue){
                 highQueue.offer(user);
+                highQueue.notify();
             }
             System.out.println("用户" + user.getUsername() + "进入高级队列");
         } else {
             synchronized (veryHighQueue){
                 veryHighQueue.offer(user);
+                veryHighQueue.notify();
             }
             System.out.println("用户" + user.getUsername() + "进入超高级队列");
         }
@@ -66,14 +70,13 @@ public class Matcher {
     }
 
     // 针对三个对列创建线程
-    public void match(){
+    // 构造方法，这样就不需要手动调用start方法了
+    public Matcher(){
         Thread thread1 = new Thread() {
             @Override
             public void run() {
                 while (true) {
                     handlerMatch(normalQueue);
-                    // notify可以唤醒wait，让线程继续执行
-                    normalQueue.notify();
                 }
             }
         };
@@ -84,7 +87,6 @@ public class Matcher {
             public void run() {
                 while (true) {
                     handlerMatch(highQueue);
-                    highQueue.notify();
                 }
             }
         };
@@ -95,7 +97,6 @@ public class Matcher {
             public void run() {
                 while (true) {
                     handlerMatch(veryHighQueue);
-                    veryHighQueue.notify();
                 }
             }
         };

@@ -85,6 +85,8 @@ public class MatchAPI extends TextWebSocketHandler {
             response.setOk(false);
             response.setMessage("非法的匹配请求");
         }
+        // 把响应发送给给客户端
+        session.sendMessage(new TextMessage(objectMapper.writeValueAsString(response)));
     }
 
     @Override

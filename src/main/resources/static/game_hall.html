@@ -87,7 +87,7 @@
                 //如果当前readystate处于open状态，说明连接良好
                 //这里发送的数据有两种可能，开始匹配/停止匹配
                 if (matchButton.innerHTML == '开始匹配') {
-                    console.log("starting match")
+                    console.log("开始匹配")
                     websocket.send(JSON.stringify({
                         message: 'startMatch',
                     }));
