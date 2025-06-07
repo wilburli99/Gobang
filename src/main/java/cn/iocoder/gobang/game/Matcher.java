@@ -22,6 +22,8 @@ public class Matcher {
     private OnlineUserManage  onlineUserManage;
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private RoomManager roomManager;
 
     // 添加用户到匹配队列
     public void add(User user){
@@ -138,7 +140,9 @@ public class Matcher {
                     matchQueue.offer(player1);
                     return;
                 }
-                // 4. TODO 把两个玩家放到同一个游戏房间中
+                // 4. 把两个玩家放到同一个游戏房间中
+                Room room = new Room();
+                roomManager.add(room, player1.getUserId(), player2.getUserId());
 
                 // 5. 给玩家反馈信息：匹配成功
                 // 通过WebSocketSession.sendMessage()，发送消息给玩家"matchSuccess"

@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class RoomManager {
     private ConcurrentHashMap<String, Room> rooms = new ConcurrentHashMap<>();
+    // 用户id和房间id的映射
     private ConcurrentHashMap<Integer, String> userIdToRoomId = new ConcurrentHashMap<>();
 
     public void add(Room room, int userId1, int userId2) {
