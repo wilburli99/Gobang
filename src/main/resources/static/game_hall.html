@@ -43,7 +43,10 @@
             console.log("onopen");
         }
         websocket.onclose = function() {
+            // 如果连接断开，则提示用户重新登录
             console.log("onclose");
+            alert("当前和后端连接已断开，请重新登录");
+            location.assign('/login.html');
         }
         websocket.onerror = function() {
             console.log("onerror");
