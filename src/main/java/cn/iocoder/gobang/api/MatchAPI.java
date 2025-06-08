@@ -36,8 +36,8 @@ public class MatchAPI extends TextWebSocketHandler {
         try  {
             User user = (User) session.getAttributes().get("user");
             //2. 应先判断用户是否在线，如果在线，则不允许重复登录
-            WebSocketSession temSession = onlineUserManage.getFromGameHall(user.getUserId());
-            if (temSession != null){
+            if (onlineUserManage.getFromGameHall(user.getUserId()) != null
+                    || onlineUserManage.getFromGameRoom(user.getUserId()) != null){
                 MatchRequest response = new MatchRequest();
                 response.setOk(false);
                 response.setReason("禁止多开！");

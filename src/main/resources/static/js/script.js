@@ -219,12 +219,4 @@ function initGame() {
     }
 }
 
-// 在 script.js 最后加上（仅调试用，正式环境不要加）
-window.onload = function() {
-    if (!window.websocket || websocket.readyState !== 1) {
-        // 没有websocket连接时，直接初始化棋盘
-        initGame();
-    }
-}
-
 
