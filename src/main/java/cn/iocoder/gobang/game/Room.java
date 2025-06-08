@@ -10,6 +10,8 @@ public class Room {
     private String roomId;
     private User user1;
     private User user2;
+    // 先手
+    private int whiteUser;
 
     public Room(){
         // 使用UUID来生成随机的字符串作为房间ID
