@@ -45,8 +45,6 @@
         websocket.onclose = function() {
             // 如果连接断开，则提示用户重新登录
             console.log("onclose");
-            alert("当前和后端连接已断开，请重新登录");
-            location.assign('/login.html');
         }
         websocket.onerror = function() {
             console.log("onerror");
@@ -77,9 +75,12 @@
                 //已经匹配到对手
                 console.log("匹配到对手，进入游戏房间!");
                 location.assign("/game_room.html");
+            } else if (resp.message == "repeatConnection") {
+                // 防多开的
+                alert("当前和游戏大厅断开连接");
+                location.assign('/login.html');
             } else {
                 console.log("收到非法响应! message = " + resp.message);
-                
             }
         }
         //匹配按钮的点击事件
