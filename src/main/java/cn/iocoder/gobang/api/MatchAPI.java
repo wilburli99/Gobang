@@ -102,11 +102,12 @@ public class MatchAPI extends TextWebSocketHandler {
             // 如果玩家遭遇异常而断开websocket连接, 则需要把玩家从匹配对列中移除
             matcher.remove(user);
         } catch (NullPointerException e) {
-            e.printStackTrace();
-            MatchRequest request = new MatchRequest();
-            request.setOk(false);
-            request.setReason("用户未登录，无法进行后续匹配功能");
-            session.sendMessage(new TextMessage(objectMapper.writeValueAsString(request)));
+            System.out.println("[MatchAPI.afterConnectionClosed] 当前用户未登录!");
+//            e.printStackTrace();
+//            MatchRequest response = new MatchRequest();
+//            response.setOk(false);
+//            response.setReason("用户未登录，无法进行后续匹配功能");
+//            session.sendMessage(new TextMessage(objectMapper.writeValueAsString(response)));
         }
     }
 
@@ -123,11 +124,14 @@ public class MatchAPI extends TextWebSocketHandler {
             // 如果玩家遭遇异常而断开websocket连接, 则需要把玩家从匹配对列中移除
             matcher.remove(user);
         } catch (NullPointerException e) {
-            e.printStackTrace();
-            MatchRequest request = new MatchRequest();
-            request.setOk(false);
-            request.setReason("用户未登录，无法进行后续匹配功能");
-            session.sendMessage(new TextMessage(objectMapper.writeValueAsString(request)));
+            System.out.println("[MatchAPI.afterConnectionClosed] 当前用户未登录!");
+//            e.printStackTrace();
+            // 这个代码之前写的草率了!!
+            // 不应该在连接关闭之后, 还尝试发送消息给客户端
+//            MatchRequest response = new MatchRequest();
+//            response.setOk(false);
+//            response.setReason("用户未登录，无法进行后续匹配功能");
+//            session.sendMessage(new TextMessage(objectMapper.writeValueAsString(response)));
         }
     }
 }

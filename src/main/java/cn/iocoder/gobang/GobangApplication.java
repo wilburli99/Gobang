@@ -1,13 +1,17 @@
 package cn.iocoder.gobang;
 
+import org.springframework.boot.ConfigurableBootstrapContext;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 
 @SpringBootApplication
 public class GobangApplication {
 
+    public static ConfigurableApplicationContext context;
+
     public static void main(String[] args) {
-        SpringApplication.run(GobangApplication.class, args);
+        context = SpringApplication.run(GobangApplication.class, args);
     }
 
 }
