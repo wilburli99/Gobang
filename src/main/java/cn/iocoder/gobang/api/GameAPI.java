@@ -43,7 +43,7 @@ public class GameAPI extends TextWebSocketHandler {
 
         // 2. 判定当前用户是否已经进入房间（拿着房间管理器进行查询）
         Room room = roomManager.getRoomByUserId(user.getUserId());
-        if (room != null) {
+        if (room == null) {
             resp.setOk(false);
             resp.setReason("用户尚未匹配到！");
             session.sendMessage(new TextMessage(objectMapper.writeValueAsString(resp)));
@@ -53,8 +53,9 @@ public class GameAPI extends TextWebSocketHandler {
         // 3. 判定是不是多开（用户是不是已经在其他地方进入游戏了）
         if (onlineUserManage.getFromGameHall(user.getUserId()) != null
                 || onlineUserManage.getFromGameRoom(user.getUserId()) != null) {
-            resp.setOk(false);
+            resp.setOk(true);
             resp.setReason("禁止多开！");
+            resp.setMessage("repeatConnection");
             session.sendMessage(new TextMessage(objectMapper.writeValueAsString(resp)));
             return;
         }
@@ -80,6 +81,7 @@ public class GameAPI extends TextWebSocketHandler {
                 // 把先连接进房间的玩家设置为先手方
                 room.setWhiteUser(user.getUserId());
                 System.out.println("用户" + user.getUsername() + "已准备就绪");
+                return;
             }
             if (room.getUser2() == null) {
                 room.setUser2(user);
@@ -118,12 +120,23 @@ public class GameAPI extends TextWebSocketHandler {
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+        // 1. 先从 session 里拿到当前用户的身份信息
+        User user = (User) session.getAttributes().get("user");
+        if (user == null) {
+            System.out.println("[handleTextMessage] 当前玩家尚未登录! ");
+            return;
+        }
+
+        // 2. 根据玩家 id 获取到房间对象
+        Room room = roomManager.getRoomByUserId(user.getUserId());
+        // 3. 通过 room 对象来处理这次具体的请求
+        room.putChess(message.getPayload());
     }
 
     @Override
     public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
         User user = (User) session.getAttributes().get("user");
-        if (user != null) {
+        if (user == null) {
             // 这里简单处理， 在断开连接的时候就不给客户端返回响应了。
             return;
         }
@@ -138,7 +151,7 @@ public class GameAPI extends TextWebSocketHandler {
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         // 玩家下线
         User user = (User) session.getAttributes().get("user");
-        if (user != null) {
+        if (user == null) {
             // 这里简单处理， 在断开连接的时候就不给客户端返回响应了。
             return;
         }

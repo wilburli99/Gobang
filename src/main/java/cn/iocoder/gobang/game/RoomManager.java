@@ -17,8 +17,8 @@ public class RoomManager {
         userIdToRoomId.put(userId2, room.getRoomId());
     }
 
-    public void remove(Room room, int userId1, int userId2) {
-        rooms.remove(room.getRoomId());
+    public void remove(String roomId, int userId1, int userId2) {
+        rooms.remove(roomId);
         // 移除用户和房间的映射关系
         userIdToRoomId.remove(userId1);
         userIdToRoomId.remove(userId2);
