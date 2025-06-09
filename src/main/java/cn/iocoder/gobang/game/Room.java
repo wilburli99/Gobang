@@ -18,13 +18,15 @@ public class Room {
     private User user2;
     // 先手
     private int whiteUser;
+    private static final int MAX_ROW = 15;
+    private static final int MAX_COL = 15;
     // 棋盘
     // 这个二维数组用来表示棋盘
     // 约定:
     // 1) 使用 0 表示当前位置未落子. 初始化好的 int 二维数组, 就相当于是 全 0
     // 2) 使用 1 表示 user1 的落子位置
     // 3) 使用 2 表示 user2 的落子位置
-    private int[][] board = new int[15][15];
+    private int[][] board = new int[MAX_ROW][MAX_COL];
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -39,6 +41,7 @@ public class Room {
         roomId = UUID.randomUUID().toString();
         // 手动注入对象
         onlineUserManage = GobangApplication.context.getBean(OnlineUserManage.class);
+        roomManager = GobangApplication.context.getBean(RoomManager.class);
         userMapper = GobangApplication.context.getBean(UserMapper.class);
     }
     // 通过这个方法处理一次落子操作
@@ -60,7 +63,7 @@ public class Room {
         }
         board[row][col] = chess;
         // 2. 打印出当前的棋盘信息, 方便来观察局势. 也方便后面验证胜负关系的判定.
-//        printBoard();
+        printBoard();
 
         // 3. 进行胜负判定
         int winner = checkWinner(row, col, chess);
@@ -99,30 +102,30 @@ public class Room {
         if (response.getWinner() != 0) {
             // 胜负已分
             System.out.println("游戏结束! 房间即将销毁! roomId=" + roomId + " 获胜方为: " + response.getWinner());
-//            // 更新获胜方和失败方的信息.
-//            int winUserId = response.getWinner();
-//            int loseUserId = response.getWinner() == user1.getUserId() ? user2.getUserId() : user1.getUserId();
-//            userMapper.userWin(winUserId);
-//            userMapper.userLose(loseUserId);
+            // 更新获胜方和失败方的信息.
+            int winUserId = response.getWinner();
+            int loseUserId = response.getWinner() == user1.getUserId() ? user2.getUserId() : user1.getUserId();
+            userMapper.userWin(winUserId);
+            userMapper.userLose(loseUserId);
             // 销毁房间
             roomManager.remove(roomId, user1.getUserId(), user2.getUserId());
         }
     }
 
-//    private void printBoard() {
-//        // 打印出棋盘
-//        System.out.println("[打印棋盘信息] " + roomId);
-//        System.out.println("=====================================================================");
-//        for (int r = 0; r < MAX_ROW; r++) {
-//            for (int c = 0; c < MAX_COL; c++) {
-//                // 针对一行之内的若干列, 不要打印换行
-//                System.out.print(board[r][c] + " ");
-//            }
-//            // 每次遍历完一行之后, 再打印换行.
-//            System.out.println();
-//        }
-//        System.out.println("=====================================================================");
-//    }
+    private void printBoard() {
+        // 打印出棋盘
+        System.out.println("[打印棋盘信息] " + roomId);
+        System.out.println("=====================================================================");
+        for (int r = 0; r < MAX_ROW; r++) {
+            for (int c = 0; c < MAX_COL; c++) {
+                // 针对一行之内的若干列, 不要打印换行
+                System.out.print(board[r][c] + " ");
+            }
+            // 每次遍历完一行之后, 再打印换行.
+            System.out.println();
+        }
+        System.out.println("=====================================================================");
+    }
 
     // 使用这个方法来判定当前落子是否分出胜负.
     // 约定如果玩家1 获胜, 就返回玩家1 的 userId

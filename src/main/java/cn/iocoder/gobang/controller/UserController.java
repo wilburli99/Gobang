@@ -46,7 +46,10 @@ public class UserController {
             // 获取session, false表示不创建session,当已经登录时，获取session
             HttpSession session = request.getSession(false);
             User user = (User)session.getAttribute("user");
-            return user;
+            // 这里获取的用户信息是当时登录的时候保存的session信息，所以当玩家的信息改变后就无法显示最新的信息
+            // 所以要从数据库中获取最新的信息
+            User newUser = userMapper.selectByName(user.getUsername());
+            return newUser;
         } catch (NullPointerException e){
             return new User();
         }

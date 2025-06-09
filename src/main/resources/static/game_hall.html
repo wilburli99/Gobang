@@ -74,11 +74,13 @@
             } else if (resp.message == "matchSuccess") {
                 //已经匹配到对手
                 console.log("匹配到对手，进入游戏房间!");
-                location.assign("/game_room.html");
+                // location.assign("/game_room.html");
+                location.replace("/game_room.html");
             } else if (resp.message == "repeatConnection") {
                 // 防多开的
                 alert("当前和游戏大厅断开连接");
-                location.assign('/login.html');
+                // location.assign('/login.html');
+                location.replace('/login.html');
             } else {
                 console.log("收到非法响应! message = " + resp.message);
             }
@@ -104,7 +106,8 @@
             } else {
                 //说明当前是异常状态。
                 alert("当前连接已断开，请重新登录");
-                location.assign('/login.html')
+                // location.assign('/login.html')
+                location.replace('/login.html')
             }
         }
     </script>

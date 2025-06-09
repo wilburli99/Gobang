@@ -49,7 +49,8 @@ public class MatchAPI extends TextWebSocketHandler {
             onlineUserManage.enterGameHall(user.getUserId(), session);
             System.out.println("用户" + user.getUsername() + "上线了");
         } catch (NullPointerException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            System.out.println("[MatchAPI.afterConnectionEstablished] 当前用户未登录!");
             // 出现空指针异常，说明用户的身份信息为空，说明用户没有登录
             // 需要把该信息返回
             MatchRequest request = new MatchRequest();
