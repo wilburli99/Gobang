@@ -38,7 +38,8 @@
         });
 
         // 此处进行初始化 websocket，并且实现前端的匹配逻辑
-        let websocket = new WebSocket('ws:/127.0.0.1:8080/findMatch');
+        let websocketUrl = 'ws://'+ location.host + '/findMatch';
+        let websocket = new websocket(websocketUrl);
         websocket.onopen = function() {
             console.log("onopen");
         }
