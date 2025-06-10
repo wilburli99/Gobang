@@ -28,6 +28,8 @@ public class GameAPI extends TextWebSocketHandler {
     private RoomManager roomManager;
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private Matcher matcher;
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
@@ -68,8 +70,6 @@ public class GameAPI extends TextWebSocketHandler {
         // 因此前面匹配到对手之后，需要经过页面跳转，来到game_room.html 才算正式进入房间
         // 当前这个逻辑是在 game_room.htm1 页面加载的时候进行的.
         // 执行到当前逻辑，说明玩家已经页面跳转成功了
-        // 页面跳转，其实是个大活~~(很有可能出现"失败”的情况的)
-
         synchronized (room) { 
             // 加锁是为了保证房间状态的一致性，如果不加锁，可能会出现竞态条件，导致房间状态混乱：
             // 两个玩家都被设置成 user1，user2 永远为 null。
@@ -136,34 +136,83 @@ public class GameAPI extends TextWebSocketHandler {
     @Override
     public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
         User user = (User) session.getAttributes().get("user");
-        if (user == null) {
-            // 这里简单处理， 在断开连接的时候就不给客户端返回响应了。
-            return;
+        if (user == null) return;
+
+        // 1. 获取当前用户所在的房间
+        Room room = roomManager.getRoomByUserId(user.getUserId());
+
+        // 2. 清理在线用户管理器的状态
+        // 用户离开游戏房间
+        onlineUserManage.exitGameRoom(user.getUserId());
+        // 如果用户在大厅中，也需要清理
+        onlineUserManage.exitGameHall(user.getUserId());
+
+        // 3. 处理房间和对手逻辑
+        if (room != null) {
+            // 如果房间里有对手，通知对手获胜并清理房间
+            User otherUser = (user == room.getUser1()) ? room.getUser2() : room.getUser1();
+            if (otherUser != null && onlineUserManage.getFromGameRoom(otherUser.getUserId()) != null) {
+                // 只有对手还在房间里，才通知对手获胜
+                noticeThatUserWin(user); // 这个方法会处理通知对手和 roomManager.remove
+            } else {
+                // 如果房间里只有自己，或者对手已经不在了，直接移除房间
+                // 避免 noticeThatUserWin 内部因为找不到对手而提前 return 导致房间未释放
+                roomManager.remove(room.getRoomId(), room.getUser1().getUserId(), room.getUser2().getUserId());
+            }
         }
-        WebSocketSession exitSession = onlineUserManage.getFromGameHall(user.getUserId());
-        if (session == exitSession) {
-            onlineUserManage.exitGameHall(user.getUserId());
-        }
-        System.out.println("当前用户" + user.getUserId() + "游戏房间连接异常");
-        noticeThatUserWin(user);
+        // 4. 从匹配队列中移除用户（确保不会有残留用户在匹配队列中）
+        // 你需要确保 Matche`r 实例能够被获取到
+        // Matcher matcher = GobangApplication.context.getBean(Matcher.class); // 如果是静态获取
+        // matcher.remove(user); // 确保 Matcher.remove 能正确处理
+        System.out.println("当前用户" + user.getUserId() + "离开游戏房间并清理状态");
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        // 玩家下线
+        // // 玩家下线
+        // User user = (User) session.getAttributes().get("user");
+        // if (user == null) {
+        //     // 这里简单处理， 在断开连接的时候就不给客户端返回响应了。
+        //     return;
+        // }
+        // WebSocketSession exitSession = onlineUserManage.getFromGameHall(user.getUserId());
+        // if (session == exitSession) {
+        //     // 这个判定，为了避免在多开的情况下第二个用户退出链接动作，导致第一个用户的会话被删除
+        //     onlineUserManage.exitGameHall(user.getUserId());
+        // }
+        // System.out.println("当前用户" + user.getUserId() + "离开游戏房间");
+        // // 通知对手获胜
+        // noticeThatUserWin(user);
         User user = (User) session.getAttributes().get("user");
-        if (user == null) {
-            // 这里简单处理， 在断开连接的时候就不给客户端返回响应了。
-            return;
+        if (user == null) return;
+
+        // 1. 获取当前用户所在的房间
+        Room room = roomManager.getRoomByUserId(user.getUserId());
+
+        // 2. 清理在线用户管理器的状态
+        // 用户离开游戏房间
+        onlineUserManage.exitGameRoom(user.getUserId());
+        // 如果用户在大厅中，也需要清理
+        onlineUserManage.exitGameHall(user.getUserId());
+
+        // 3. 处理房间和对手逻辑
+        if (room != null) {
+            // 如果房间里有对手，通知对手获胜并清理房间
+            User otherUser = (user == room.getUser1()) ? room.getUser2() : room.getUser1();
+            if (otherUser != null && onlineUserManage.getFromGameRoom(otherUser.getUserId()) != null) {
+                // 只有对手还在房间里，才通知对手获胜
+                noticeThatUserWin(user); // 这个方法会处理通知对手和 roomManager.remove
+            } else {
+                // 如果房间里只有自己，或者对手已经不在了，直接移除房间
+                // 避免 noticeThatUserWin 内部因为找不到对手而提前 return 导致房间未释放
+                roomManager.remove(room.getRoomId(), room.getUser1().getUserId(), room.getUser2().getUserId());
+            }
         }
-        WebSocketSession exitSession = onlineUserManage.getFromGameHall(user.getUserId());
-        if (session == exitSession) {
-            // 这个判定，为了避免在多开的情况下第二个用户退出链接动作，导致第一个用户的会话被删除
-            onlineUserManage.exitGameHall(user.getUserId());
-        }
-        System.out.println("当前用户" + user.getUserId() + "离开游戏房间");
-        // 通知对手获胜
-        noticeThatUserWin(user);
+        // 4. 从匹配队列中移除用户（确保不会有残留用户在匹配队列中）
+        // 你需要确保 Matche`r 实例能够被获取到
+        // 如果是静态获取
+        matcher.remove(user); // 确保 Matcher.remove 能正确处理
+        System.out.println("当前用户" + user.getUserId() + "离开游戏房间并清理状态");
     }
 
     private void noticeThatUserWin(User user) throws IOException {
