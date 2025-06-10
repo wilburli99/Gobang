@@ -13,13 +13,31 @@ html, body {
 }
 
 .nav {
-    height: 90px;
+    height: 50px;
     background-color: rgba(0, 0, 0, 0.5);
     color: #fff;
-    line-height: 50px;
-    padding: 0 20px;
-    font-size: 50px;
-    font-weight: 700;
+    /* line-height: 50px; */
+    padding: 0 40px;
+    font-size: 28px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logout-btn {
+    background-color: rgba(207, 203, 203, 0.5);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    padding: 5px 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+    line-height: normal;
+}
+.logout-btn:hover {
+    background-color: #495057;
 }
 
 .container {

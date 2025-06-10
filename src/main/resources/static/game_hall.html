@@ -9,7 +9,8 @@
 </head>
 <body>
     <div class="nav">
-        五子棋对战平台
+        <span>五子棋对战平台</span>
+        <button id="logout-btn" class="logout-btn">退出登录</button>
     </div>
     <div class="container">
         <!-- 用于打包用户信息和匹配按钮 -->
@@ -22,6 +23,7 @@
     </div>
 
     <script src="js/jquery.min.js"></script>
+    <script src="js/game_hall.js"></script>
     <script>
         $.ajax({
             type: 'get',
@@ -39,7 +41,7 @@
 
         // 此处进行初始化 websocket，并且实现前端的匹配逻辑
         let websocketUrl = 'ws://'+ location.host + '/findMatch';
-        let websocket = new websocket(websocketUrl);
+        let websocket = new WebSocket(websocketUrl);
         websocket.onopen = function() {
             console.log("onopen");
         }

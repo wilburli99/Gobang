@@ -6,6 +6,7 @@
     <title>Document</title>
     <link rel="stylesheet" href="css/common.css">
     <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="css/register.css">
 </head>
 <body>
     <div class="nav">
@@ -23,12 +24,17 @@
                 <input type="password" id="password">
             </div>
             <div class="row">
-                <button id="submit">提交</button>
+                <button id="submit">登陆</button>
+            </div>
+            <div style="text-align: center; margin-top: 20px;">
+                <button id="register-btn" type="button" class="register-btn">注册账号</button>
             </div>
         </div>
     </div>
+    <div id="toast"></div>
 
     <script src="js/jquery.min.js"></script>
+    <script src="js/toast.js"></script>
     <script>
         let usernameInput = document.querySelector('#username');
         let passwordInput = document.querySelector('#password');
@@ -44,8 +50,10 @@
                 },
                 success: function(body){
                     if (body && body.userId > 0){
-                        alert("登录成功");
-                        location.assign('/game_hall.html');
+                        showToast("登录成功");
+                        setTimeout(function() {
+                            location.assign('/game_hall.html');
+                        }, 1000);
                     } else {
                         alert("登录失败");
                     }
@@ -54,6 +62,9 @@
                     alert("登录失败");
                 }
             });
+        };
+        document.querySelector('#register-btn').onclick = function() {
+            location.href = 'register.html';
         };
     </script>
 </body>
