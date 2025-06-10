@@ -113,9 +113,17 @@ public class GameAPI extends TextWebSocketHandler {
         resp.setThisUserId(thisUser.getUserId());
         resp.setThatUserId(thatUser.getUserId());
         resp.setWhiteUser(room.getWhiteUser());
+
+        // 获取并设置用户名
+        // 这里假设 thisUser 和 thatUser 已经是完整的 User 对象，包含了 username
+        // 如果不是，你需要通过 userMapper.selectById(userId) 来获取
+        resp.setThisUsername(thisUser.getUsername()); // <-- 新增：设置当前玩家的用户名
+        resp.setThatUsername(thatUser.getUsername()); // <-- 新增：设置对手玩家的用户名
         // 把当前的响应数据传回给玩家.
         WebSocketSession webSocketSession = onlineUserManage.getFromGameRoom(thisUser.getUserId());
-        webSocketSession.sendMessage(new TextMessage(objectMapper.writeValueAsString(resp)));
+        if (webSocketSession != null) { // 增加判空，防止 session 已关闭
+            webSocketSession.sendMessage(new TextMessage(objectMapper.writeValueAsString(resp)));
+        }
     }
 
     @Override

@@ -47,4 +47,5 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-direction: column; /* 确保container的子元素（.game-area 和 #screen）是垂直排列的 */
 }

@@ -11,4 +11,6 @@ public class GameReadyResponse {
     private int thisUserId;
     private int thatUserId;
     private int whiteUser;
+    private String thisUsername; // 新增：当前玩家的用户名
+    private String thatUsername; // 新增：对手玩家的用户名
 }

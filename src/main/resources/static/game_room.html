@@ -13,14 +13,30 @@
     </div>
     <div class="container">
         <div>
-            <!-- 棋盘区域，需要用canvas绘制 -->
-             <canvas id="chess" width="450" height="450">
+            <div class="game-area">
+                <!-- 玩家信息区域 - 放在棋盘上方 -->
+                <div class="players-header">
+                    <!-- 左侧玩家信息 -->
+                    <div class="player-info left-player">
+                        <p id="player1-label"></p>
+                        <p id="player1-username"></p>
+                        <p>棋子: <span id="player1-piece"></span></p>
+                    </div>
+                    
+                    <!-- 右侧玩家信息 -->
+                    <div class="player-info right-player">
+                        <p id="player2-label"></p>
+                        <p id="player2-username"></p>
+                        <p>棋子: <span id="player2-piece"></span></p>
+                    </div>
+                </div>
 
-             </canvas>
-             <!-- 显示区域 -->
-             <div id="screen">
-                等待玩家连接中......
-             </div>
+                <!-- 棋盘区域 -->
+                <canvas id="chess" width="450" height="450"></canvas>
+                
+                <!-- 显示区域 -->
+                <div id="screen">等待玩家连接中......</div>
+            </div>
         </div>
     </div>
     <script src="js/script.js"></script>

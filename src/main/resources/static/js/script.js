@@ -13,9 +13,17 @@ function setScreenText(me) {
     let screen = document.querySelector('#screen');
     if (me) {
         screen.innerHTML = "轮到你落子了!";
+        screen.style.display = "block"; // 确保显示
     } else {
         screen.innerHTML = "轮到对方落子了!";
+        screen.style.display = "block"; // 确保显示
     }
+}
+
+// 添加一个函数来隐藏等待连接的提示
+function hideWaitingScreen() {
+    let screen = document.querySelector('#screen');
+    screen.style.display = "none";
 }
 
 //////////////////////////////////////////////////
@@ -59,6 +67,31 @@ websocket.onmessage = function(event) {
         gameInfo.thisUserId = resp.thisUserId;
         gameInfo.thatUserId = resp.thatUserId;
         gameInfo.isWhite = (resp.whiteUser == resp.thisUserId);
+
+        let player1UsernameSpan = document.querySelector('#player1-username');
+        let player1PieceSpan = document.querySelector('#player1-piece');
+        let player2UsernameSpan = document.querySelector('#player2-username');
+        let player2PieceSpan = document.querySelector('#player2-piece');
+        let player1Label = document.querySelector('#player1-label');
+        let player2Label = document.querySelector('#player2-label');
+
+        // 根据谁是白棋，谁是黑棋来显示用户名和棋子颜色
+        // resp.thisUsername 和 resp.thatUsername 现在应该包含了真实的用户名
+        if (gameInfo.isWhite) {
+            player1Label.innerText = "你："; // 我是白棋
+            player1UsernameSpan.innerText = resp.thisUsername; // 显示我的用户名
+            player1PieceSpan.innerText = "白子";
+            player2Label.innerText = "对手："; // 对手是黑棋
+            player2UsernameSpan.innerText = resp.thatUsername; // 显示对手用户名
+            player2PieceSpan.innerText = "黑子";
+        } else {
+            player1Label.innerText = "你："; // 我是黑棋
+            player1UsernameSpan.innerText = resp.thisUsername; // 显示我的用户名
+            player1PieceSpan.innerText = "黑子";
+            player2Label.innerText = "对手："; // 对手是白棋
+            player2UsernameSpan.innerText = resp.thatUsername; // 显示对手用户名
+            player2PieceSpan.innerText = "白子";
+        }
 
         // 初始化棋盘
         initGame();
@@ -197,7 +230,7 @@ function initGame() {
             if (resp.winner == gameInfo.thisUserId) {
                 // alert('你赢了!');
                 screenDiv.innerHTML = '你赢了!';
-            } else if (resp.winner = gameInfo.thatUserId) {
+            } else if (resp.winner == gameInfo.thatUserId) {
                 // alert('你输了!');
                 screenDiv.innerHTML = '你输了!';
             } else {
@@ -215,6 +248,9 @@ function initGame() {
             }
             let fatherDiv = document.querySelector('.container>div');
             fatherDiv.appendChild(backBtn);
+            
+            // 设置游戏结束标志
+            over = true;
         }
     }
 }
