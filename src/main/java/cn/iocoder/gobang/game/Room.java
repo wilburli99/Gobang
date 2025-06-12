@@ -36,6 +36,9 @@ public class Room {
 
     private RoomManager roomManager;
 
+    // 超时情况下的特殊坐标值
+    private static final int TIMEOUT_POSITION = -1;
+
     public Room(){
         // 使用UUID来生成随机的字符串作为房间ID
         roomId = UUID.randomUUID().toString();
@@ -49,9 +52,18 @@ public class Room {
     // 2.进行胜负判定
     // 3.给客户端返回响应
     public void putChess(String reqJson) throws IOException {
-        // 1. 记录当前落子的位置.
+        // 1. 解析请求
         GameRequest request = objectMapper.readValue(reqJson, GameRequest.class);
         GameResponse response = new GameResponse();
+        
+        // 2. 检查是否是超时消息
+        if ("timeout".equals(request.getMessage())) {
+            // 处理超时情况
+            handleTimeout(request.getUserId());
+            return;
+        }
+        
+        // 3. 处理正常落子
         // 当前这个子是玩家1 落的还是玩家2 落的. 根据这个玩家1 和 玩家2 来决定往数组中是写 1 还是 2
         int chess = request.getUserId() == user1.getUserId() ? 1 : 2;
         int row = request.getRow();
@@ -62,13 +74,13 @@ public class Room {
             return;
         }
         board[row][col] = chess;
-        // 2. 打印出当前的棋盘信息, 方便来观察局势. 也方便后面验证胜负关系的判定.
+        // 4. 打印出当前的棋盘信息, 方便来观察局势. 也方便后面验证胜负关系的判定.
         printBoard();
 
-        // 3. 进行胜负判定
+        // 5. 进行胜负判定
         int winner = checkWinner(row, col, chess);
 
-        // 4. 给房间中的所有客户端都返回响应.
+        // 6. 给房间中的所有客户端都返回响应.
         response.setMessage("putChess");
         response.setUserId(request.getUserId());
         response.setRow(row);
@@ -98,7 +110,7 @@ public class Room {
             session2.sendMessage(new TextMessage(respJson));
         }
 
-        // 5. 如果当前胜负已分, 此时这个房间就失去存在的意义了. 就可以直接销毁房间. (把房间从房间管理器中给移除)
+        // 7. 如果当前胜负已分, 此时这个房间就失去存在的意义了. 就可以直接销毁房间. (把房间从房间管理器中给移除)
         if (response.getWinner() != 0) {
             // 胜负已分
             System.out.println("游戏结束! 房间即将销毁! roomId=" + roomId + " 获胜方为: " + response.getWinner());
@@ -110,6 +122,43 @@ public class Room {
             // 销毁房间
             roomManager.remove(roomId, user1.getUserId(), user2.getUserId());
         }
+    }
+    
+    // 处理超时情况
+    private void handleTimeout(int timeoutUserId) throws IOException {
+        System.out.println("玩家 " + timeoutUserId + " 超时!");
+        
+        // 确定获胜方（非超时方获胜）
+        int winnerUserId = (timeoutUserId == user1.getUserId()) ? user2.getUserId() : user1.getUserId();
+        
+        // 构造响应
+        GameResponse response = new GameResponse();
+        response.setMessage("putChess");
+        response.setUserId(timeoutUserId);
+        response.setRow(TIMEOUT_POSITION);
+        response.setCol(TIMEOUT_POSITION);
+        response.setWinner(winnerUserId);
+        
+        // 发送响应给两个玩家
+        WebSocketSession session1 = onlineUserManage.getFromGameRoom(user1.getUserId());
+        WebSocketSession session2 = onlineUserManage.getFromGameRoom(user2.getUserId());
+        
+        String respJson = objectMapper.writeValueAsString(response);
+        if (session1 != null) {
+            session1.sendMessage(new TextMessage(respJson));
+        }
+        if (session2 != null) {
+            session2.sendMessage(new TextMessage(respJson));
+        }
+        
+        // 更新玩家分数
+        userMapper.userWin(winnerUserId);
+        userMapper.userLose(timeoutUserId);
+        
+        // 销毁房间
+        roomManager.remove(roomId, user1.getUserId(), user2.getUserId());
+        
+        System.out.println("超时游戏结束! 获胜方: " + winnerUserId);
     }
 
     private void printBoard() {
